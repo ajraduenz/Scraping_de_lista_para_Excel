@@ -2,13 +2,13 @@ const request = require('request')
 const cheerio = require('cheerio')
 
 // ---------- Banco de Dados
-const mysql = require('mysql')
-const connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'jr',
-    password : '12345678',
-    database : 'filmes'
-  })
+// const mysql = require('mysql')
+// const connection = mysql.createConnection({
+//     host     : 'localhost',
+//     user     : 'jr',
+//     password : '12345678',
+//     database : 'filmes'
+//   })
 // connection.connect(function(err) {
 //     if (err) {
 //       console.error('Erro de conexão: ' + err.stack)    
@@ -25,19 +25,49 @@ const connection = mysql.createConnection({
 //     }
 // })
 
-connection.connect(function(err){
-    if(err) {
-    console.error('Erro ao realizar a conexão com o BD: ' + err)}
-    return
+// connection.connect(function(err){
+//     if(err) {
+//     console.error('Erro ao realizar a conexão com o BD: ' + err)}
+//     return
+// })
+
+// connection.query("INSERT INTO filme(nome) VALUES ('A volta dos que não foram')", function(err, result){
+//     if(!err){
+//         console.log('Filme cadastrado com sucesso')
+//     }else{
+//     console.log('Filme cadastrado com sucesso')
+//     }
+// })
+
+const Sequelize = require('sequelize')
+
+const sequelize = new Sequelize('filmes', 'jr', '12345678', {
+    host: 'localhost',
+    dialect: 'mysql'
 })
 
-connection.query("INSERT INTO filme(nome) VALUES ('A volta dos que não foram')", function(err, result){
-    if(!err){
-        console.log('Filme cadastrado com sucesso')
-    }else{
-    console.log('Filme cadastrado com sucesso')
-    }
+sequelize.authenticate().then(function(){
+    console.log('conexão realizada com sucesso')
+}).catch(function(err){
+    console.log('erro: ' + err)
 })
+
+const Pagamento = sequelize.define('filme', {
+    nome: {
+        type: Sequelize.STRING
+    },
+    valor: {
+        type: Sequelize.DOUBLE
+    }
+});
+
+
+//Inserir registro no banco de dados
+Pagamento.create({
+    nome: "Energia",
+    valor: 220
+})
+
 
 // ---------- Extração
 // request('https://www.imdb.com/chart/moviemeter', function(err, res, body) {
@@ -51,5 +81,5 @@ connection.query("INSERT INTO filme(nome) VALUES ('A volta dos que não foram')"
 
 //         console.log('Titulo: ' + title)
 //     })
-    
+
 // })
