@@ -41,7 +41,7 @@ const cheerio = require('cheerio')
 
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize('filmes', 'jr', '12345678', {
+const sequelize = new Sequelize('imdb_filmes', 'jr', '12345678',  {
     host: 'localhost',
     dialect: 'mysql'
 })
@@ -52,34 +52,29 @@ sequelize.authenticate().then(function(){
     console.log('erro: ' + err)
 })
 
-const Pagamento = sequelize.define('filme', {
-    nome: {
+const cadastrar = sequelize.define('nome_do_filme', {
+    Nome_do_filmecol: {
         type: Sequelize.STRING
-    },
-    valor: {
-        type: Sequelize.DOUBLE
     }
 });
 
+// ---------- Extração
+request('https://www.imdb.com/chart/moviemeter', function(err, res, body) {
+    if (err) console.log('Erro: ' + err);
 
-//Inserir registro no banco de dados
-Pagamento.create({
-    nome: "Energia",
-    valor: 220
+    var $ = cheerio .load(body);
+
+    $('.lister-list tr').each(function(){
+        var title = $(this).find('.titleColumn a').text().trim()
+        var rating =$(this).find('.imdbRating strong').text().trim()
+        cadastrar.create({
+            Nome_do_filmecol: title
+        })
+
+        console.log('Titulo: ' + title)
+    })
+
 })
 
 
-// ---------- Extração
-// request('https://www.imdb.com/chart/moviemeter', function(err, res, body) {
-//     if (err) console.log('Erro: ' + err);
-
-//     var $ = cheerio .load(body);
-
-//     $('.lister-list tr').each(function(){
-//         var title = $(this).find('.titleColumn a').text().trim()
-//         var rating =$(this).find('.imdbRating strong').text().trim()
-
-//         console.log('Titulo: ' + title)
-//     })
-
-// })
+//Inserir registro no banco de dados
