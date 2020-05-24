@@ -41,14 +41,14 @@ const cheerio = require('cheerio')
 
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize('imdb_filmes', 'jr', '12345678',  {
+const sequelize = new Sequelize('imdb_filmes', 'jr', '12345678', {
     host: 'localhost',
     dialect: 'mysql'
 })
 
-sequelize.authenticate().then(function(){
+sequelize.authenticate().then(function () {
     console.log('conexão realizada com sucesso')
-}).catch(function(err){
+}).catch(function (err) {
     console.log('erro: ' + err)
 })
 
@@ -56,17 +56,26 @@ const cadastrar = sequelize.define('nome_do_filme', {
     Nome_do_filmecol: {
         type: Sequelize.STRING
     }
-});
+    
+},
+    {
+        // disable the modification of table names; By default, sequelize will automatically
+        // transform all passed model names (first parameter of define) into plural.
+        // if you don't want that, set the following
+        freezeTableName: true,
+    },{
+        timestamps: false
+    });
 
 // ---------- Extração
-request('https://www.imdb.com/chart/moviemeter', function(err, res, body) {
+request('https://www.imdb.com/chart/moviemeter', function (err, res, body) {
     if (err) console.log('Erro: ' + err);
 
-    var $ = cheerio .load(body);
+    var $ = cheerio.load(body);
 
-    $('.lister-list tr').each(function(){
+    $('.lister-list tr').each(function () {
         var title = $(this).find('.titleColumn a').text().trim()
-        var rating =$(this).find('.imdbRating strong').text().trim()
+        var rating = $(this).find('.imdbRating strong').text().trim()
         cadastrar.create({
             Nome_do_filmecol: title
         })
